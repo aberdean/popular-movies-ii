@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.aberdean.popularmoviesi;
+package com.example.android.aberdean.popularmoviesii;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -27,8 +27,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.example.android.aberdean.popularmoviesi.utilities.MovieJsonUtils;
-import com.example.android.aberdean.popularmoviesi.utilities.NetworkUtils;
+import com.example.android.aberdean.popularmoviesii.utilities.MovieJsonUtils;
+import com.example.android.aberdean.popularmoviesii.utilities.NetworkUtils;
 
 import java.net.URL;
 import java.util.ArrayList;

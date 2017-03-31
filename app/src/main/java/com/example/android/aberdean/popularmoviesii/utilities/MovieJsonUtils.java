@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.aberdean.popularmoviesi.utilities;
+package com.example.android.aberdean.popularmoviesii.utilities;
 
 import android.content.Context;
 

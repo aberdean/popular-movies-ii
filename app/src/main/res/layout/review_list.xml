@@ -14,15 +14,16 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<resources>
-    <string name="app_name">PopularMovies</string>
-    <string name="top_rated">Top Rated</string>
-    <string name="most_popular">Most Popular</string>
-    <string name="released">Released: %1$s</string>
-    <string name="rating">Rating: %1$s</string>
-    <string name="attrib">Powered by TMDb</string>
-    <string name="dark">Dark Theme</string>
-    <string name="light">Light Theme</string>
-    <string name="review_title">Reviews</string>
-    <string name="trailer_title">Trailers</string>
-</resources>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/tv_reviews"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textColor="@color/colorText"
+        android:textSize="@dimen/text_small" />
+
+</RelativeLayout>

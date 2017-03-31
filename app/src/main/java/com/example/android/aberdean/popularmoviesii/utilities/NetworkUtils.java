@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.example.android.aberdean.popularmoviesi.utilities;
+package com.example.android.aberdean.popularmoviesii.utilities;
 
 import android.net.Uri;
 import android.util.Log;
 
-import com.example.android.aberdean.popularmoviesi.BuildConfig;
+import com.example.android.aberdean.popularmoviesii.BuildConfig;
 
 import java.io.IOException;
 import java.io.InputStream;

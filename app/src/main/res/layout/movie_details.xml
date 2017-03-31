@@ -44,81 +44,124 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:divider="?android:dividerHorizontal"
             android:orientation="vertical">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="@dimen/padding"
-                    android:paddingRight="@dimen/padding"
-                    android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingLeft="@dimen/padding"
+                android:paddingRight="@dimen/padding">
 
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
 
                     <ImageView
                         android:id="@+id/iv_poster_thumb"
                         android:layout_width="@dimen/thumb_width"
                         android:layout_height="@dimen/thumb_height"
+                        android:layout_weight="1"
                         android:paddingTop="@dimen/thumb_padding_top"
-                        android:scaleType="fitXY"
-                        android:layout_weight="1" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:paddingLeft="@dimen/padding"
-                        android:paddingTop="@dimen/backdrop_height"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/tv_title"
-                            android:layout_width="wrap_content"
-                            android:layout_height="@dimen/title_height"
-                            android:gravity="center_vertical"
-                            android:textAppearance="@style/Base.TextAppearance.AppCompat.Title"
-                            android:textColor="@color/colorAccent"
-                            android:textSize="@dimen/text_large"/>
-
-                        <TextView
-                            android:id="@+id/tv_release_date"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/colorText"
-                            android:textSize="@dimen/text_medium"/>
-
-                        <TextView
-                            android:id="@+id/tv_rating"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/colorText"
-                            android:textSize="@dimen/text_medium"/>
-                    </LinearLayout>
-
+                        android:scaleType="fitXY" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:gravity="center_vertical"
+                    android:orientation="vertical"
                     android:paddingLeft="@dimen/padding"
-                    android:paddingRight="@dimen/padding">
+                    android:paddingTop="@dimen/backdrop_height">
 
                     <TextView
-                        android:id="@+id/tv_synopsis"
+                        android:id="@+id/tv_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/title_height"
+                        android:gravity="center_vertical"
+                        android:textAppearance="@style/Base.TextAppearance.AppCompat.Title"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="@dimen/text_large" />
+
+                    <TextView
+                        android:id="@+id/tv_release_date"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingTop="@dimen/padding"
-                        android:paddingBottom="@dimen/padding"
                         android:textColor="@color/colorText"
-                        android:textSize="@dimen/text_small"/>
+                        android:textSize="@dimen/text_medium" />
+
+                    <TextView
+                        android:id="@+id/tv_rating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/colorText"
+                        android:textSize="@dimen/text_medium" />
                 </LinearLayout>
 
             </LinearLayout>
 
-        </ScrollView>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="@dimen/padding">
+
+                <TextView
+                    android:id="@+id/tv_synopsis"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/padding"
+                    android:textColor="@color/colorText"
+                    android:textSize="@dimen/text_small" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:divider="?android:dividerVertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/recyclerview_trailers"
+                        android:layout_width="191dp"
+                        android:layout_height="match_parent" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding"
+                    android:divider="?android:dividerHorizontal">
+
+                    <TextView
+                        android:id="@+id/tv_review_heading"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingBottom="@dimen/padding"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="@dimen/text_large"
+                        android:text="@string/review_title"/>
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/recyclerview_reviews"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </FrameLayout>
 

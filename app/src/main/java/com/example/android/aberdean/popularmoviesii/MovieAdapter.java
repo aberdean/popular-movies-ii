@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.aberdean.popularmoviesi;
+package com.example.android.aberdean.popularmoviesii;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

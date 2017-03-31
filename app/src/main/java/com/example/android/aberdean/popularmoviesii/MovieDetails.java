@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.aberdean.popularmoviesi;
+package com.example.android.aberdean.popularmoviesii;
 
 import android.content.Intent;
 import android.content.res.Resources;
@@ -31,8 +31,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.android.aberdean.popularmoviesi.utilities.MovieJsonUtils;
-import com.example.android.aberdean.popularmoviesi.utilities.NetworkUtils;
+import com.example.android.aberdean.popularmoviesii.utilities.MovieJsonUtils;
+import com.example.android.aberdean.popularmoviesii.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
 
 import java.net.URL;
