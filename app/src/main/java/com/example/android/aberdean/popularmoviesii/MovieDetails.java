@@ -18,9 +18,12 @@ package com.example.android.aberdean.popularmoviesi;
 
 import android.content.Intent;
 import android.content.res.Resources;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -28,8 +31,11 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.android.aberdean.popularmoviesi.utilities.MovieJsonUtils;
+import com.example.android.aberdean.popularmoviesi.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
 
+import java.net.URL;
 import java.util.ArrayList;
 
 /**
@@ -39,6 +45,11 @@ import java.util.ArrayList;
  * Allows the user to choose between a dark and light theme.
  */
 public class MovieDetails extends AppCompatActivity {
+
+    private String mId;
+
+    private ReviewAdapter mReviewAdapter;
+    private TrailerAdapter mTrailerAdapter;
 
     private ImageView mBackdrop;
     private ImageView mPosterThumb;
@@ -55,6 +66,9 @@ public class MovieDetails extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.movie_details);
+
+        RecyclerView mReviews = (RecyclerView) findViewById(R.id.recyclerview_reviews);
+        RecyclerView mTrailers = (RecyclerView) findViewById(R.id.recyclerview_trailers);
 
         mBackdrop = (ImageView) findViewById(R.id.iv_backdrop);
         mPosterThumb = (ImageView) findViewById(R.id.iv_poster_thumb);
@@ -92,9 +106,63 @@ public class MovieDetails extends AppCompatActivity {
                 String rate = String.format(
                         res.getString(R.string.rating), rating);
                 mRating.setText(rate);
+
+                mId = mChosenMovie.get(6).toString();
         }
+
+        LinearLayoutManager reviewLayoutManager = new LinearLayoutManager(this,
+                LinearLayoutManager.VERTICAL, false);
+
+        mReviews.setLayoutManager(reviewLayoutManager);
+        mReviews.setHasFixedSize(true);
+
+        mReviewAdapter = new ReviewAdapter();
+        mReviews.setAdapter(mReviewAdapter);
+
+        fetchReviews();
+
     }
 
+    private void fetchReviews() {
+        new ReviewQueryTask().execute(mId);
+    }
+
+    public class ReviewQueryTask extends
+            AsyncTask<String, String, String[]> {
+
+        @Override
+        protected String[] doInBackground(String... params) {
+            if (params.length == 0) {
+                return null;
+            }
+
+            String id = params[0];
+            URL reviewRequestUrl = NetworkUtils
+                    .buildAdditionalDetailsUrl(id, "/reviews");
+
+            try {
+                String jsonReviewResponse = NetworkUtils
+                        .getResponseFromHttpUrl(reviewRequestUrl);
+
+                String[] jsonReviewData = MovieJsonUtils
+                        .getReviewStringsFromJson(MovieDetails.this,
+                                jsonReviewResponse);
+
+                return jsonReviewData;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String[] reviewData) {
+            if (reviewData != null) {
+                mReviewAdapter.setReviewData(reviewData);
+            }
+        }
+    }
 
     /**
      * Builds the url for the appropriate movie's poster and backdrop,
@@ -114,6 +182,8 @@ public class MovieDetails extends AppCompatActivity {
                 .into(mBackdrop);
     }
 
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -121,6 +191,7 @@ public class MovieDetails extends AppCompatActivity {
         return true;
     }
 
+    //TODO: Move color scheme choice to preferences
     /**
      * Allows the user to toggle between a light and a dark theme.
      * @param item the selected menu item

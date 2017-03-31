@@ -30,8 +30,8 @@ import java.net.HttpURLConnection;
 public final class MovieJsonUtils {
 
     /**
-     * Parse JSON from a TMDb response and return an array of Strings
-     * describing a movie.
+     * Parse JSON from a TMDb response and return an array of String arrays
+     * describing the various characteristics of a movie.
      *
      * @param context the context from which this method is called
      * @param movieJsonString JSON response from server
@@ -58,6 +58,7 @@ public final class MovieJsonUtils {
         final String MJ_RELEASE_DATE = "release_date";
         final String MJ_ORIGINAL_TITLE = "original_title";
         final String MJ_VOTE_AVERAGE = "vote_average";
+        final String MJ_ID = "id";
 
         /* HTTP status codes */
         final String MJ_STATUS_CODE = "status_code";
@@ -69,6 +70,7 @@ public final class MovieJsonUtils {
         String[] parsedReleaseDate;
         String[] parsedTitle;
         String[] parsedRating;
+        String[] parsedId;
 
         JSONObject movieJson = new JSONObject(movieJsonString);
 
@@ -94,6 +96,7 @@ public final class MovieJsonUtils {
         parsedReleaseDate = new String[movieArray.length()];
         parsedTitle = new String[movieArray.length()];
         parsedRating = new String[movieArray.length()];
+        parsedId = new String[movieArray.length()];
 
         for (int i = 0; i < movieArray.length(); i++) {
             /* Values to be collected */
@@ -103,6 +106,7 @@ public final class MovieJsonUtils {
             String releaseDate;
             String title;
             String rating;
+            String id;
 
             /* Get the JSON object representing the movie */
             JSONObject movieData = movieArray.getJSONObject(i);
@@ -113,6 +117,7 @@ public final class MovieJsonUtils {
             releaseDate = movieData.getString(MJ_RELEASE_DATE);
             title = movieData.getString(MJ_ORIGINAL_TITLE);
             rating = movieData.getString(MJ_VOTE_AVERAGE);
+            id = movieData.getString(MJ_ID);
 
             parsedPosterUri[i] = posterPath;
             parsedBackdropUri[i] = backdropPath;
@@ -120,14 +125,77 @@ public final class MovieJsonUtils {
             parsedReleaseDate[i] = releaseDate;
             parsedTitle[i] = title;
             parsedRating[i] = rating;
+            parsedId[i] = id;
 
         }
 
         // variable parsedMovieData is needed to format the data
         String[][] parsedMovieData = {parsedPosterUri, parsedBackdropUri,
                 parsedDescription, parsedReleaseDate,
-                parsedTitle, parsedRating};
+                parsedTitle, parsedRating, parsedId};
 
         return parsedMovieData;
+    }
+
+    /**
+     * Parse JSON from a TMDb response and return an array of Strings
+     * listing all the reviews for a selected movie.
+     *
+     * @param context the context from which this method is called
+     * @param reviewJsonString JSON response from server
+     *
+     * @return Array of Strings listing the reviews for a movie
+     *
+     * @throws JSONException If JSON data cannot be parsed
+     */
+    public static String[] getReviewStringsFromJson(
+            Context context, String reviewJsonString) throws JSONException {
+
+        /* All the reviews are children of the "reviews" array. */
+        final String MJ_RESULTS = "results";
+
+        final String MJ_AUTHOR = "author";
+        final String MJ_REVIEW = "content";
+
+        /* HTTP status codes */
+        final String MJ_STATUS_CODE = "status_code";
+
+        /* String array to hold each review */
+        String [] parsedReviews = null;
+
+        JSONObject reviewJson = new JSONObject(reviewJsonString);
+
+        if (reviewJson.has(MJ_STATUS_CODE)) {
+            int errorCode = reviewJson.getInt(MJ_STATUS_CODE);
+
+            switch (errorCode) {
+                case HttpURLConnection.HTTP_OK:
+                    break;
+                case HttpURLConnection.HTTP_NOT_FOUND:
+                    return null;
+                default:
+                    return null;
+            }
+        }
+
+        JSONArray reviewArray = reviewJson.getJSONArray(MJ_RESULTS);
+
+        parsedReviews = new String[reviewArray.length()];
+
+        for (int i = 0; i < reviewArray.length(); i++) {
+            /* Values to be collected */
+            String author;
+            String review;
+
+            /* Get the JSON object representing the review */
+            JSONObject reviewData = reviewArray.getJSONObject(i);
+
+            author = reviewData.getString(MJ_AUTHOR);
+            review = reviewData.getString(MJ_REVIEW);
+
+            parsedReviews[i] = "Author: " + author + "\r\n\r\n" + review + "\r\n\r\n";
+        }
+
+        return parsedReviews;
     }
 }

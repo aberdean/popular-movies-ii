@@ -47,7 +47,7 @@ public final class NetworkUtils {
     private static final String LANGUAGE_PARAM = "language";
 
     /**
-     * Builds the URL used to connect to TMDb.
+     * Builds the URL used to connect to TMDb to fetch the movies.
      *
      * @param sortOrder The type of sorting to perform (popularity or rating)
      * @return The URL to use to query the movie database
@@ -66,6 +66,30 @@ public final class NetworkUtils {
         }
 
         Log.v(TAG, "Built URI " + url);
+        return url;
+    }
+
+    /**
+     * Builds the URL used to fetch reviews and trailers for a movie from TMDb.
+     *
+     * @param id The id of the movie
+     * @param type The type of data (either reviews or trailers)
+     * @return The URL to use to query the movie database
+     */
+    public static URL buildAdditionalDetailsUrl(String id, String type) {
+        Uri builtUri = Uri.parse(BASE_URL + id + type).buildUpon()
+                .appendQueryParameter(API_KEY_PARAM, API_KEY)
+                .appendQueryParameter(LANGUAGE_PARAM, LANGUAGE)
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e){
+            e.printStackTrace();
+        }
+
+        Log.v(TAG, "Built Review/Trailer URI " + url);
         return url;
     }
 
