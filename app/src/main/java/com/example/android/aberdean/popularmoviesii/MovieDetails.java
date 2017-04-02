@@ -18,12 +18,14 @@ package com.example.android.aberdean.popularmoviesii;
 
 import android.content.Intent;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -38,15 +40,21 @@ import com.squareup.picasso.Picasso;
 import java.net.URL;
 import java.util.ArrayList;
 
+import static android.content.Intent.ACTION_VIEW;
+
 /**
  * Presents the user with a detailed view of the chosen movie,
  * including a backdrop picture, a thumbnail poster, the original title,
  * release date and rating, and a synopsis.
  * Allows the user to choose between a dark and light theme.
  */
-public class MovieDetails extends AppCompatActivity {
+public class MovieDetails extends AppCompatActivity
+        implements TrailerAdapter.TrailerAdapterOnClickHandler {
+
+    private static final String TAG = MovieDetails.class.getSimpleName();
 
     private String mId;
+    private ArrayList<String> mTrailerUris;
 
     private ReviewAdapter mReviewAdapter;
     private TrailerAdapter mTrailerAdapter;
@@ -119,7 +127,20 @@ public class MovieDetails extends AppCompatActivity {
         mReviewAdapter = new ReviewAdapter();
         mReviews.setAdapter(mReviewAdapter);
 
+        LinearLayoutManager trailerLayoutManager = new LinearLayoutManager(this,
+                LinearLayoutManager.VERTICAL, false);
+
+        mTrailers.setLayoutManager(trailerLayoutManager);
+        mTrailers.setHasFixedSize(true);
+
+        mTrailerAdapter = new TrailerAdapter(this);
+        mTrailers.setAdapter(mTrailerAdapter);
+
         fetchReviews();
+        fetchTrailers();
+
+        fetchReviews();
+        fetchTrailers();
 
     }
 
@@ -160,6 +181,73 @@ public class MovieDetails extends AppCompatActivity {
         protected void onPostExecute(String[] reviewData) {
             if (reviewData != null) {
                 mReviewAdapter.setReviewData(reviewData);
+            }
+        }
+    }
+
+    /**
+     * When a trailer thumbnail is clicked, starts an implicit intent to launch
+     * the trailer either on a YouTube app or on a browser.
+     * @param trailerPosition the position of the trailer in the ArrayList
+     */
+    public void onClick(int trailerPosition) {
+        String trailer = mTrailerUris.get(trailerPosition);
+        Intent intentToStartTrailer = new Intent(ACTION_VIEW, Uri.parse(trailer));
+        startActivity(intentToStartTrailer);
+    }
+
+    private void fetchTrailers() {
+        new TrailerQueryTask().execute(mId);
+    }
+
+    public class TrailerQueryTask extends
+            AsyncTask<String, String, String[]> {
+
+        @Override
+        protected String[] doInBackground(String... params) {
+            if (params.length == 0) {
+                return null;
+            }
+
+            String id = params[0];
+            URL trailerRequestUrl = NetworkUtils
+                    .buildAdditionalDetailsUrl(id, "/videos");
+
+            try {
+                String jsonTrailerResponse = NetworkUtils
+                        .getResponseFromHttpUrl(trailerRequestUrl);
+
+                String[] jsonTrailerData = MovieJsonUtils
+                        .getTrailerStringsFromJson(MovieDetails.this,
+                                jsonTrailerResponse);
+                Log.v(TAG, "Trailer Codes: " + jsonTrailerData);
+                return jsonTrailerData;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String[] trailerData) {
+            if (trailerData != null) {
+
+                String[] trailerCodes = trailerData;
+                ArrayList<String> mTrailerThumbUris =
+                        new ArrayList<>(trailerCodes.length);
+                mTrailerUris =
+                        new ArrayList<>(trailerCodes.length);
+                for (String trailerCode : trailerCodes) {
+                    String baseTrailerThumbUri =
+                            "https://img.youtube.com/vi/";
+                    String endTrailerThumbUri = "/0.jpg";
+                    mTrailerThumbUris.add(baseTrailerThumbUri + trailerCode + endTrailerThumbUri);
+
+                    String baseTrailerUri = "https://www.youtube.com/watch?v=";
+                    mTrailerUris.add(baseTrailerUri + trailerCode);
+                }
+                mTrailerAdapter.setTrailerData(mTrailerThumbUris);
+
             }
         }
     }

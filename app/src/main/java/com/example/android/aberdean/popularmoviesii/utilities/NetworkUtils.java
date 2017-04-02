@@ -73,7 +73,7 @@ public final class NetworkUtils {
      * Builds the URL used to fetch reviews and trailers for a movie from TMDb.
      *
      * @param id The id of the movie
-     * @param type The type of data (either reviews or trailers)
+     * @param type The type of data (either reviews or videos)
      * @return The URL to use to query the movie database
      */
     public static URL buildAdditionalDetailsUrl(String id, String type) {

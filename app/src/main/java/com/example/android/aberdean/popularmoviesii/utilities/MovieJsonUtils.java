@@ -151,7 +151,7 @@ public final class MovieJsonUtils {
     public static String[] getReviewStringsFromJson(
             Context context, String reviewJsonString) throws JSONException {
 
-        /* All the reviews are children of the "reviews" array. */
+        /* All the reviews are children of the "results" array. */
         final String MJ_RESULTS = "results";
 
         final String MJ_AUTHOR = "author";
@@ -197,5 +197,64 @@ public final class MovieJsonUtils {
         }
 
         return parsedReviews;
+    }
+
+    /**
+     * Parse JSON from a TMDb response and return an array of Strings
+     * listing all the trailer codes for a selected movie.
+     *
+     * @param context the context from which this method is called
+     * @param trailerJsonString JSON response from server
+     *
+     * @return Array of Strings listing the trailer codes for a movie
+     *
+     * @throws JSONException If JSON data cannot be parsed
+     */
+    public static String[] getTrailerStringsFromJson(
+            Context context, String trailerJsonString) throws JSONException {
+
+        /* All the trailer codes are children of the "results" array. */
+        final String MJ_RESULTS = "results";
+
+        final String MJ_TRAILER_CODE = "key";
+
+        /* HTTP status codes */
+        final String MJ_STATUS_CODE = "status_code";
+
+        /* String array to hold each review */
+        String [] parsedTrailerCodes = null;
+
+        JSONObject trailerJson = new JSONObject(trailerJsonString);
+
+        if (trailerJson.has(MJ_STATUS_CODE)) {
+            int errorCode = trailerJson.getInt(MJ_STATUS_CODE);
+
+            switch (errorCode) {
+                case HttpURLConnection.HTTP_OK:
+                    break;
+                case HttpURLConnection.HTTP_NOT_FOUND:
+                    return null;
+                default:
+                    return null;
+            }
+        }
+
+        JSONArray trailerCodeArray = trailerJson.getJSONArray(MJ_RESULTS);
+
+        parsedTrailerCodes = new String[trailerCodeArray.length()];
+
+        for (int i = 0; i < trailerCodeArray.length(); i++) {
+            /* Values to be collected */
+            String code;
+
+            /* Get the JSON object representing the review */
+            JSONObject trailerData = trailerCodeArray.getJSONObject(i);
+
+            code = trailerData.getString(MJ_TRAILER_CODE);
+
+            parsedTrailerCodes[i] = code;
+        }
+
+        return parsedTrailerCodes;
     }
 }

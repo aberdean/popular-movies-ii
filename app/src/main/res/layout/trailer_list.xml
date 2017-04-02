@@ -14,8 +14,15 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<resources>
-    <dimen name="trailer_width">320dp</dimen>
-    <dimen name="review_width">340dp</dimen>
-    <integer name="num_of_columns">3</integer>
-</resources>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/iv_trailers"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerInside" />
+
+</RelativeLayout>
