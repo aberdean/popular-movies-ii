@@ -23,6 +23,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import butterknife.ButterKnife;
+import butterknife.BindView;
+
 /**
  * Passes the reviews for a movie retrieved from IMDb
  * into the RecyclerView.
@@ -37,11 +40,11 @@ class ReviewAdapter
     }
 
     public class ReviewAdapterViewHolder extends RecyclerView.ViewHolder {
-        public final TextView mReviewTextView;
+        @BindView(R.id.tv_reviews) TextView mReviewTextView;
 
         public ReviewAdapterViewHolder(View view) {
             super(view);
-            mReviewTextView = (TextView) view.findViewById(R.id.tv_reviews);
+            ButterKnife.bind(this, view);
         }
     }
 

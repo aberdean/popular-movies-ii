@@ -21,13 +21,15 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+
+import butterknife.ButterKnife;
+import butterknife.BindView;
 
 /**
  * Renders the thumbnails of the trailers for a movie retrieved from IMDb
@@ -53,15 +55,13 @@ class TrailerAdapter
         mClickHandler = clickHandler;
     }
 
-    class TrailerAdapterViewHolder extends RecyclerView.ViewHolder
-            implements OnClickListener {
+    class TrailerAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        private final ImageView mTrailerImageView;
+        @BindView(R.id.iv_trailers) ImageView mTrailerImageView;
 
         TrailerAdapterViewHolder(View view) {
             super(view);
-            mTrailerImageView = (ImageView)
-                    view.findViewById(R.id.iv_trailers);
+            ButterKnife.bind(this, view);
             view.setOnClickListener(this);
         }
 
@@ -69,7 +69,6 @@ class TrailerAdapter
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
             mClickHandler.onClick(adapterPosition);
-
         }
     }
 

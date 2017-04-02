@@ -40,6 +40,9 @@ import com.squareup.picasso.Picasso;
 import java.net.URL;
 import java.util.ArrayList;
 
+import butterknife.ButterKnife;
+import butterknife.BindView;
+
 import static android.content.Intent.ACTION_VIEW;
 
 /**
@@ -59,12 +62,16 @@ public class MovieDetails extends AppCompatActivity
     private ReviewAdapter mReviewAdapter;
     private TrailerAdapter mTrailerAdapter;
 
-    private ImageView mBackdrop;
-    private ImageView mPosterThumb;
+    @BindView(R.id.recyclerview_reviews) RecyclerView mReviews;
+    @BindView(R.id.recyclerview_trailers) RecyclerView mTrailers;
 
-    private TextView mSynopsis;
-    private TextView mReleaseDate;
-    private TextView mRating;
+    @BindView(R.id.iv_backdrop) ImageView mBackdrop;
+    @BindView(R.id.iv_poster_thumb) ImageView mPosterThumb;
+
+    @BindView(R.id.tv_title) TextView mOriginalTitle;
+    @BindView(R.id.tv_synopsis) TextView mSynopsis;
+    @BindView(R.id.tv_release_date) TextView mReleaseDate;
+    @BindView(R.id.tv_rating) TextView mRating;
 
     /**
      * Assigns the appropriate values for the chosen movie.
@@ -74,17 +81,7 @@ public class MovieDetails extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.movie_details);
-
-        RecyclerView mReviews = (RecyclerView) findViewById(R.id.recyclerview_reviews);
-        RecyclerView mTrailers = (RecyclerView) findViewById(R.id.recyclerview_trailers);
-
-        mBackdrop = (ImageView) findViewById(R.id.iv_backdrop);
-        mPosterThumb = (ImageView) findViewById(R.id.iv_poster_thumb);
-
-        mSynopsis = (TextView) findViewById(R.id.tv_synopsis);
-        mReleaseDate = (TextView) findViewById(R.id.tv_release_date);
-        TextView mOriginalTitle = (TextView) findViewById(R.id.tv_title);
-        mRating = (TextView) findViewById(R.id.tv_rating);
+        ButterKnife.bind(this);
 
         Intent intent = getIntent();
 
@@ -139,16 +136,13 @@ public class MovieDetails extends AppCompatActivity
         fetchReviews();
         fetchTrailers();
 
-        fetchReviews();
-        fetchTrailers();
-
     }
 
     private void fetchReviews() {
         new ReviewQueryTask().execute(mId);
     }
 
-    public class ReviewQueryTask extends
+    private class ReviewQueryTask extends
             AsyncTask<String, String, String[]> {
 
         @Override
@@ -190,6 +184,7 @@ public class MovieDetails extends AppCompatActivity
      * the trailer either on a YouTube app or on a browser.
      * @param trailerPosition the position of the trailer in the ArrayList
      */
+    @Override
     public void onClick(int trailerPosition) {
         String trailer = mTrailerUris.get(trailerPosition);
         Intent intentToStartTrailer = new Intent(ACTION_VIEW, Uri.parse(trailer));
@@ -200,7 +195,7 @@ public class MovieDetails extends AppCompatActivity
         new TrailerQueryTask().execute(mId);
     }
 
-    public class TrailerQueryTask extends
+    private class TrailerQueryTask extends
             AsyncTask<String, String, String[]> {
 
         @Override

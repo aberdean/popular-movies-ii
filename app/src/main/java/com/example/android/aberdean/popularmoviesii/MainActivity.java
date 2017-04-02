@@ -33,6 +33,9 @@ import com.example.android.aberdean.popularmoviesii.utilities.NetworkUtils;
 import java.net.URL;
 import java.util.ArrayList;
 
+import butterknife.ButterKnife;
+import butterknife.BindView;
+
 /**
  * Shows a list of popular movies' posters organized in a grid view.
  * Allows the user to select sorting by popularity or by rating.
@@ -49,6 +52,8 @@ public class MainActivity extends AppCompatActivity
     @SuppressWarnings("unused")
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    @BindView(R.id.recyclerview_posters) RecyclerView mRecyclerView;
+
     private MovieAdapter mMovieAdapter;
 
     private String[][] mJsonMovieData;
@@ -58,9 +63,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        RecyclerView mRecyclerView = (RecyclerView)
-                findViewById(R.id.recyclerview_posters);
+        ButterKnife.bind(this);
 
         GridLayoutManager layoutManager =
                 new GridLayoutManager(this, getResources()
@@ -105,7 +108,7 @@ public class MainActivity extends AppCompatActivity
         return chosenMovie;
     }
 
-    public class MovieQueryTask extends
+    private class MovieQueryTask extends
             AsyncTask<String, String[], String[][]> {
 
         @Override

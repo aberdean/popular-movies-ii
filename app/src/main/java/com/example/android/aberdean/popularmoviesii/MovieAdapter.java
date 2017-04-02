@@ -28,6 +28,9 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Renders the poster images of the movies retrieved from IMDb
  * and passes them to the RecyclerView.
@@ -53,12 +56,11 @@ class MovieAdapter
     class MovieAdapterViewHolder extends RecyclerView.ViewHolder
             implements OnClickListener {
 
-        private final ImageView mPosterImageView;
+        @BindView(R.id.iv_movie_poster) ImageView mPosterImageView;
 
         MovieAdapterViewHolder(View view) {
             super(view);
-            mPosterImageView = (ImageView)
-                    view.findViewById(R.id.iv_movie_poster);
+            ButterKnife.bind(this, view);
             view.setOnClickListener(this);
         }
 
