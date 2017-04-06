@@ -19,7 +19,6 @@ package com.example.android.aberdean.popularmoviesii;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -33,15 +32,22 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.android.aberdean.popularmoviesii.utilities.MovieJsonUtils;
-import com.example.android.aberdean.popularmoviesii.utilities.NetworkUtils;
+import com.example.android.aberdean.popularmoviesii.models.Movie;
+import com.example.android.aberdean.popularmoviesii.models.Review;
+import com.example.android.aberdean.popularmoviesii.models.Trailer;
+import com.example.android.aberdean.popularmoviesii.utilities.MoviesDbService;
+import com.example.android.aberdean.popularmoviesii.utilities.ReviewsResponse;
+import com.example.android.aberdean.popularmoviesii.utilities.NetworkClient;
+import com.example.android.aberdean.popularmoviesii.utilities.TrailersResponse;
 import com.squareup.picasso.Picasso;
 
-import java.net.URL;
-import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.BindView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static android.content.Intent.ACTION_VIEW;
 
@@ -56,8 +62,9 @@ public class MovieDetails extends AppCompatActivity
 
     private static final String TAG = MovieDetails.class.getSimpleName();
 
-    private String mId;
-    private ArrayList<String> mTrailerUris;
+    private Integer mId;
+
+    private List<Trailer> trailers;
 
     private ReviewAdapter mReviewAdapter;
     private TrailerAdapter mTrailerAdapter;
@@ -85,34 +92,38 @@ public class MovieDetails extends AppCompatActivity
 
         Intent intent = getIntent();
 
-        if (intent != null && intent.hasExtra("movieDetails")) {
+        if (intent != null && intent.hasExtra("movie")) {
 
-                Resources res = getResources();
+            Movie mChosenMovie = intent.getParcelableExtra("movie");
 
-                ArrayList mChosenMovie = (ArrayList<?>)
-                        intent.getSerializableExtra("movieDetails");
+            Resources res = getResources();
 
-                String posterUri = mChosenMovie.get(0).toString();
-                String backdropUri = mChosenMovie.get(1).toString();
-                setImage(posterUri, backdropUri);
+            String posterUri = mChosenMovie.getPosterUri(this);
+            Picasso.with(this)
+                    .load(posterUri)
+                    .into(mPosterThumb);
+            String backdropUri = mChosenMovie.getBackdropUri(this);
+            Picasso.with(this)
+                    .load(backdropUri)
+                    .into(mBackdrop);
 
-                String synopsis = mChosenMovie.get(2).toString();
-                mSynopsis.setText(synopsis);
+            String synopsis = mChosenMovie.getDescription();
+            mSynopsis.setText(synopsis);
 
-                String releaseDate = mChosenMovie.get(3).toString();
-                String release = String.format(
-                        res.getString(R.string.released), releaseDate);
-                mReleaseDate.setText(release);
+            String releaseDate = mChosenMovie.getReleaseDate();
+            String release = String.format(
+                    res.getString(R.string.released), releaseDate);
+            mReleaseDate.setText(release);
 
-                String title = mChosenMovie.get(4).toString();
-                mOriginalTitle.setText(title);
+            String title = mChosenMovie.getTitle();
+            mOriginalTitle.setText(title);
 
-                String rating = mChosenMovie.get(5).toString();
-                String rate = String.format(
-                        res.getString(R.string.rating), rating);
-                mRating.setText(rate);
+            Double rating = mChosenMovie.getRating();
+            String rate = String.format(
+                    res.getString(R.string.rating), rating.toString());
+            mRating.setText(rate);
 
-                mId = mChosenMovie.get(6).toString();
+            mId = mChosenMovie.getId();
         }
 
         LinearLayoutManager reviewLayoutManager = new LinearLayoutManager(this,
@@ -133,49 +144,39 @@ public class MovieDetails extends AppCompatActivity
         mTrailerAdapter = new TrailerAdapter(this);
         mTrailers.setAdapter(mTrailerAdapter);
 
-        fetchReviews();
-        fetchTrailers();
+        MoviesDbService service = NetworkClient.getClient().create(MoviesDbService.class);
+        Call<ReviewsResponse> reviewCall = service.getReviews(mId, BuildConfig.MOVIE_API_KEY);
 
-    }
+        if (reviewCall != null) {
+            reviewCall.enqueue(new Callback<ReviewsResponse>() {
+                @Override
+                public void onResponse(Call<ReviewsResponse> call, Response<ReviewsResponse> response) {
+                    List<Review> reviewData = response.body().getResults();
+                    mReviewAdapter.setReviewData(reviewData);
+                }
 
-    private void fetchReviews() {
-        new ReviewQueryTask().execute(mId);
-    }
-
-    private class ReviewQueryTask extends
-            AsyncTask<String, String, String[]> {
-
-        @Override
-        protected String[] doInBackground(String... params) {
-            if (params.length == 0) {
-                return null;
-            }
-
-            String id = params[0];
-            URL reviewRequestUrl = NetworkUtils
-                    .buildAdditionalDetailsUrl(id, "/reviews");
-
-            try {
-                String jsonReviewResponse = NetworkUtils
-                        .getResponseFromHttpUrl(reviewRequestUrl);
-
-                String[] jsonReviewData = MovieJsonUtils
-                        .getReviewStringsFromJson(MovieDetails.this,
-                                jsonReviewResponse);
-
-                return jsonReviewData;
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
+                @Override
+                public void onFailure(Call<ReviewsResponse> call, Throwable t) {
+                    Log.e(TAG, t.toString());
+                }
+            });
         }
 
-        @Override
-        protected void onPostExecute(String[] reviewData) {
-            if (reviewData != null) {
-                mReviewAdapter.setReviewData(reviewData);
-            }
+        Call<TrailersResponse> trailerCall = service.getTrailers(mId, BuildConfig.MOVIE_API_KEY);
+
+        if (trailerCall != null) {
+            trailerCall.enqueue(new Callback<TrailersResponse>() {
+                @Override
+                public void onResponse(Call<TrailersResponse> call, Response<TrailersResponse> response) {
+                    trailers = response.body().getResults();
+                    mTrailerAdapter.setTrailerData(trailers);
+                }
+
+                @Override
+                public void onFailure(Call<TrailersResponse> call, Throwable t) {
+                    Log.e(TAG, t.toString());
+                }
+            });
         }
     }
 
@@ -186,86 +187,10 @@ public class MovieDetails extends AppCompatActivity
      */
     @Override
     public void onClick(int trailerPosition) {
-        String trailer = mTrailerUris.get(trailerPosition);
-        Intent intentToStartTrailer = new Intent(ACTION_VIEW, Uri.parse(trailer));
+        Trailer trailer = trailers.get(trailerPosition);
+        Intent intentToStartTrailer = new Intent(ACTION_VIEW, Uri.parse(trailer.getTrailerUrl(this)));
         startActivity(intentToStartTrailer);
     }
-
-    private void fetchTrailers() {
-        new TrailerQueryTask().execute(mId);
-    }
-
-    private class TrailerQueryTask extends
-            AsyncTask<String, String, String[]> {
-
-        @Override
-        protected String[] doInBackground(String... params) {
-            if (params.length == 0) {
-                return null;
-            }
-
-            String id = params[0];
-            URL trailerRequestUrl = NetworkUtils
-                    .buildAdditionalDetailsUrl(id, "/videos");
-
-            try {
-                String jsonTrailerResponse = NetworkUtils
-                        .getResponseFromHttpUrl(trailerRequestUrl);
-
-                String[] jsonTrailerData = MovieJsonUtils
-                        .getTrailerStringsFromJson(MovieDetails.this,
-                                jsonTrailerResponse);
-                Log.v(TAG, "Trailer Codes: " + jsonTrailerData);
-                return jsonTrailerData;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String[] trailerData) {
-            if (trailerData != null) {
-
-                String[] trailerCodes = trailerData;
-                ArrayList<String> mTrailerThumbUris =
-                        new ArrayList<>(trailerCodes.length);
-                mTrailerUris =
-                        new ArrayList<>(trailerCodes.length);
-                for (String trailerCode : trailerCodes) {
-                    String baseTrailerThumbUri =
-                            "https://img.youtube.com/vi/";
-                    String endTrailerThumbUri = "/0.jpg";
-                    mTrailerThumbUris.add(baseTrailerThumbUri + trailerCode + endTrailerThumbUri);
-
-                    String baseTrailerUri = "https://www.youtube.com/watch?v=";
-                    mTrailerUris.add(baseTrailerUri + trailerCode);
-                }
-                mTrailerAdapter.setTrailerData(mTrailerThumbUris);
-
-            }
-        }
-    }
-
-    /**
-     * Builds the url for the appropriate movie's poster and backdrop,
-     * and loads them into their views.
-     * @param posterUri the uri to fetch the movie's poster
-     * @param backdropUri the uri to fetch the movie's backdrop
-     */
-    private void setImage(String posterUri, String backdropUri) {
-        String baseUri = "https://image.tmdb.org/t/p/w500";
-        String posterThumb = baseUri + posterUri;
-        Picasso.with(this)
-                .load(posterThumb)
-                .into(mPosterThumb);
-        String backdrop = baseUri + backdropUri;
-        Picasso.with(this)
-                .load(backdrop)
-                .into(mBackdrop);
-    }
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

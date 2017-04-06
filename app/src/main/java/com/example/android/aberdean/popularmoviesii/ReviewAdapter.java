@@ -23,8 +23,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.android.aberdean.popularmoviesii.models.Review;
+
+import java.util.List;
+
 import butterknife.ButterKnife;
 import butterknife.BindView;
+
+import static java.security.AccessController.getContext;
 
 /**
  * Passes the reviews for a movie retrieved from IMDb
@@ -33,14 +39,15 @@ import butterknife.BindView;
 class ReviewAdapter
         extends RecyclerView.Adapter<ReviewAdapter.ReviewAdapterViewHolder> {
 
-    private String[] mReviewData;
+    private List<Review> mReviewData;
 
     public ReviewAdapter() {
 
     }
 
     public class ReviewAdapterViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.tv_reviews) TextView mReviewTextView;
+        @BindView(R.id.tv_author) TextView mAuthorTextView;
+        @BindView(R.id.tv_review) TextView mReviewTextView;
 
         public ReviewAdapterViewHolder(View view) {
             super(view);
@@ -63,8 +70,12 @@ class ReviewAdapter
 
     @Override
     public void onBindViewHolder(ReviewAdapterViewHolder holder, int position) {
-        final String review = mReviewData[position];
-        holder.mReviewTextView.setText(review);
+
+        Review review = mReviewData.get(position);
+        Context context = holder.mAuthorTextView.getContext();
+        holder.mAuthorTextView.setText(String.format(context
+                .getResources().getString(R.string.review_author), review.getAuthor()));
+        holder.mReviewTextView.setText(review.getContent());
     }
 
     @Override
@@ -72,10 +83,10 @@ class ReviewAdapter
         if (mReviewData == null) {
             return 0;
         }
-        return mReviewData.length;
+        return mReviewData.size();
     }
 
-    void setReviewData(String[] reviewData) {
+    void setReviewData(List<Review> reviewData) {
         mReviewData = reviewData;
         notifyDataSetChanged();
     }

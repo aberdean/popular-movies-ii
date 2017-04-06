@@ -17,24 +17,31 @@
 package com.example.android.aberdean.popularmoviesii;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.example.android.aberdean.popularmoviesii.utilities.MovieJsonUtils;
-import com.example.android.aberdean.popularmoviesii.utilities.NetworkUtils;
+import com.example.android.aberdean.popularmoviesii.models.Movie;
+import com.example.android.aberdean.popularmoviesii.utilities.MoviesDbService;
+import com.example.android.aberdean.popularmoviesii.utilities.MoviesResponse;
+import com.example.android.aberdean.popularmoviesii.utilities.NetworkClient;
 
-import java.net.URL;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.BindView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Shows a list of popular movies' posters organized in a grid view.
@@ -52,12 +59,15 @@ public class MainActivity extends AppCompatActivity
     @SuppressWarnings("unused")
     private static final String TAG = MainActivity.class.getSimpleName();
 
+/*    // The API key must be set in a variable called ApiKey
+    // within the gradle.properties file
+    private static final String API_KEY = BuildConfig.MOVIE_API_KEY;*/
+
     @BindView(R.id.recyclerview_posters) RecyclerView mRecyclerView;
 
     private MovieAdapter mMovieAdapter;
 
-    private String[][] mJsonMovieData;
-    private String sortBy = "popular";
+    private List<Movie> movies;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,76 +85,50 @@ public class MainActivity extends AppCompatActivity
         mMovieAdapter = new MovieAdapter(this);
         mRecyclerView.setAdapter(mMovieAdapter);
 
+        fetchPosters("popular");
+
         Toast.makeText(getApplicationContext(),
                 getString(R.string.attrib), Toast.LENGTH_SHORT).show();
 
-        fetchPosters();
-
     }
 
-    private void fetchPosters() {
-        new MovieQueryTask().execute(sortBy);
+    private void fetchPosters(String sortBy) {
+        MoviesDbService service = NetworkClient.getClient().create(MoviesDbService.class);
+        Call<MoviesResponse> call = null;
+        if (sortBy.equals("popular")) {
+            call = service.getPopularMovies(BuildConfig.MOVIE_API_KEY);
+        } else if (sortBy.equals("top_rated")) {
+            call = service.getTopRatedMovies(BuildConfig.MOVIE_API_KEY);
+        }
+        if (call != null) {
+            call.enqueue(new Callback<MoviesResponse>() {
+                @Override
+                public void onResponse(Call<MoviesResponse> call, Response<MoviesResponse> response) {
+                    movies = response.body().getResults();
+                    ArrayList<String> mPosterUris = new ArrayList<>(movies.size());
+                    for (Movie movie : movies) {
+                        mPosterUris.add(movie.getPosterUri(getApplicationContext()));
+                    }
+                    mMovieAdapter.setPosterData(mPosterUris);
+                }
+
+                @Override
+                public void onFailure(Call<MoviesResponse> call, Throwable t) {
+                    Log.e(TAG, t.toString());
+                }
+            });
+        }
     }
 
     /**
      * When a movie poster is clicked, starts the MovieDetails activity.
-     * @param moviePosition the position of the movie in the ArrayList
+     * @param position the position of the movie
      */
-    public void onClick(int moviePosition) {
+    public void onClick(int position) {
         Class destinationClass = MovieDetails.class;
         Intent intentToStartMovieDetails = new Intent(this, destinationClass);
-        ArrayList movieDetails = getDetails(moviePosition);
-        intentToStartMovieDetails.putExtra("movieDetails", movieDetails);
+        intentToStartMovieDetails.putExtra("movie", (Parcelable) movies.get(position));
         startActivity(intentToStartMovieDetails);
-    }
-
-    private ArrayList getDetails(int position) {
-        ArrayList<String> chosenMovie =
-                new ArrayList<>(mJsonMovieData.length);
-
-        for (String[] movies : mJsonMovieData) {
-            chosenMovie.add(movies[position]);
-        }
-        return chosenMovie;
-    }
-
-    private class MovieQueryTask extends
-            AsyncTask<String, String[], String[][]> {
-
-        @Override
-        protected String[][] doInBackground(String... params) {
-            String sortOrder = params[0];
-            URL movieRequestUrl = NetworkUtils.buildUrl(sortOrder);
-            try {
-                String jsonMovieResponse = NetworkUtils
-                        .getResponseFromHttpUrl(movieRequestUrl);
-
-                mJsonMovieData = MovieJsonUtils
-                        .getMovieStringsFromJson(MainActivity.this,
-                                jsonMovieResponse);
-
-                return mJsonMovieData;
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String[][] movieData) {
-            if (movieData != null) {
-                String[] posterData = movieData[0];
-                ArrayList<String> mPosterUris =
-                        new ArrayList<>(posterData.length);
-                for (String posterUri : posterData) {
-                    String basePosterUri =
-                            "https://image.tmdb.org/t/p/w500";
-                    mPosterUris.add(basePosterUri + posterUri);
-                }
-                mMovieAdapter.setPosterData(mPosterUris);
-            }
-        }
     }
 
     @Override
@@ -158,12 +142,10 @@ public class MainActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.sort_by_top_rated:
-                sortBy = "top_rated";
-                fetchPosters();
+                fetchPosters("top_rated");
                 return true;
             case R.id.sort_by_most_popular:
-                sortBy = "popular";
-                fetchPosters();
+                fetchPosters("popular");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

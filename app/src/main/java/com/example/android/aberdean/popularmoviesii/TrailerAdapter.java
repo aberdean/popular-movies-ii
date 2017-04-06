@@ -23,10 +23,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.example.android.aberdean.popularmoviesii.models.Trailer;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.BindView;
@@ -42,7 +44,7 @@ class TrailerAdapter
 
     private static final String TAG = TrailerAdapter.class.getSimpleName();
 
-    private ArrayList mTrailerData;
+    private List<Trailer> mTrailerData;
 
     private final TrailerAdapterOnClickHandler mClickHandler;
 
@@ -57,7 +59,8 @@ class TrailerAdapter
 
     class TrailerAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        @BindView(R.id.iv_trailers) ImageView mTrailerImageView;
+        @BindView(R.id.tv_trailer_title) TextView mTrailerTitleTextView;
+        @BindView(R.id.iv_trailer) ImageView mTrailerImageView;
 
         TrailerAdapterViewHolder(View view) {
             super(view);
@@ -87,9 +90,10 @@ class TrailerAdapter
 
     @Override
     public void onBindViewHolder(TrailerAdapterViewHolder holder, int position) {
-        Log.v(TAG, "Trailer URL " + mTrailerData.get(position).toString());
-        final String trailerUrl = mTrailerData.get(position).toString();
         Context mContext = holder.mTrailerImageView.getContext();
+        holder.mTrailerTitleTextView.setText(mTrailerData.get(position).getName());
+        Log.v(TAG, "Trailer URL " + mTrailerData.get(position).getTrailerThumbUrl(mContext));
+        final String trailerUrl = mTrailerData.get(position).getTrailerThumbUrl(mContext);
         Picasso.with(mContext)
                 .load(trailerUrl)
                 .into(holder.mTrailerImageView);
@@ -103,7 +107,7 @@ class TrailerAdapter
         return mTrailerData.size();
     }
 
-    void setTrailerData(ArrayList trailerData) {
+    void setTrailerData(List<Trailer> trailerData) {
         mTrailerData = trailerData;
         notifyDataSetChanged();
     }
