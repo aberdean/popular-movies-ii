@@ -18,7 +18,6 @@ package com.example.android.aberdean.popularmoviesii;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -33,7 +32,6 @@ import com.example.android.aberdean.popularmoviesii.utilities.MoviesDbService;
 import com.example.android.aberdean.popularmoviesii.utilities.MoviesResponse;
 import com.example.android.aberdean.popularmoviesii.utilities.NetworkClient;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -127,7 +125,7 @@ public class MainActivity extends AppCompatActivity
     public void onClick(int position) {
         Class destinationClass = MovieDetails.class;
         Intent intentToStartMovieDetails = new Intent(this, destinationClass);
-        intentToStartMovieDetails.putExtra("movie", (Parcelable) movies.get(position));
+        intentToStartMovieDetails.putExtra("movie", movies.get(position));
         startActivity(intentToStartMovieDetails);
     }
 
