@@ -22,6 +22,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -135,8 +136,9 @@ public class MovieDetails extends AppCompatActivity
         mReviewAdapter = new ReviewAdapter();
         mReviews.setAdapter(mReviewAdapter);
 
-        LinearLayoutManager trailerLayoutManager = new LinearLayoutManager(this,
-                LinearLayoutManager.VERTICAL, false);
+        GridLayoutManager trailerLayoutManager =
+                new GridLayoutManager(this, getResources()
+                        .getInteger(R.integer.num_of_columns));
 
         mTrailers.setLayoutManager(trailerLayoutManager);
         mTrailers.setHasFixedSize(true);

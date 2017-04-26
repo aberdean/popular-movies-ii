@@ -27,7 +27,8 @@
         android:layout_gravity="top"
         android:paddingBottom="@dimen/padding"
         android:textColor="@color/colorText"
-        android:textSize="@dimen/text_medium" />
+        android:textSize="@dimen/text_small"
+        android:fontFeatureSettings="smcp" />
 
     <TextView
         android:id="@+id/tv_review"

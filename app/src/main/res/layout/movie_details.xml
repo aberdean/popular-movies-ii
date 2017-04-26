@@ -78,22 +78,23 @@
                         android:layout_height="@dimen/title_height"
                         android:gravity="center_vertical"
                         android:textAppearance="@style/Base.TextAppearance.AppCompat.Title"
+                        android:fontFeatureSettings="smcp"
                         android:textColor="@color/colorAccent"
-                        android:textSize="@dimen/text_large" />
+                        android:textSize="@dimen/text_medium" />
 
                     <TextView
                         android:id="@+id/tv_release_date"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/colorText"
-                        android:textSize="@dimen/text_medium" />
+                        android:textSize="@dimen/text_small" />
 
                     <TextView
                         android:id="@+id/tv_rating"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/colorText"
-                        android:textSize="@dimen/text_medium" />
+                        android:textSize="@dimen/text_small" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -113,59 +114,55 @@
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="wrap_content"
+            <TextView
+            android:id="@+id/tv_trailer_heading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="@dimen/padding"
+            android:text="@string/trailer_title"
+            android:textColor="@color/colorAccent"
+            android:textSize="@dimen/text_medium"
+            android:fontFeatureSettings="smcp" />
+
+            <GridLayout
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal">
+                android:padding="@dimen/padding"
+                android:alignmentMode="alignMargins">
 
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:paddingLeft="@dimen/padding">
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recyclerview_trailers"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
 
-                    <TextView
-                        android:id="@+id/tv_trailer_heading"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingBottom="@dimen/padding"
-                        android:text="@string/trailer_title"
-                        android:textColor="@color/colorAccent"
-                        android:textSize="@dimen/text_large" />
+            </GridLayout>
 
-                    <android.support.v7.widget.RecyclerView
-                        android:id="@+id/recyclerview_trailers"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+            <TextView
+            android:id="@+id/tv_review_heading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="@dimen/padding"
+            android:text="@string/review_title"
+            android:textColor="@color/colorAccent"
+            android:textSize="@dimen/text_medium"
+            android:fontFeatureSettings="smcp" />
 
-                </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="@dimen/padding">
 
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:paddingLeft="@dimen/padding"
-                    android:paddingRight="@dimen/padding">
 
-                    <TextView
-                        android:id="@+id/tv_review_heading"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:paddingBottom="@dimen/padding"
-                        android:text="@string/review_title"
-                        android:textColor="@color/colorAccent"
-                        android:textSize="@dimen/text_large" />
 
-                    <android.support.v7.widget.RecyclerView
+                <android.support.v7.widget.RecyclerView
                     android:id="@+id/recyclerview_reviews"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
 
-                </LinearLayout>
-
             </LinearLayout>
+
+
 
         </LinearLayout>
 
