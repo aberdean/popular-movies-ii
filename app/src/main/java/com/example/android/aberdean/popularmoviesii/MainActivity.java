@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -57,21 +58,28 @@ public class MainActivity extends AppCompatActivity
     @SuppressWarnings("unused")
     private static final String TAG = MainActivity.class.getSimpleName();
 
-/*    // The API key must be set in a variable called ApiKey
+    // The API key must be set in a variable called ApiKey
     // within the gradle.properties file
-    private static final String API_KEY = BuildConfig.MOVIE_API_KEY;*/
+    private static final String API_KEY = BuildConfig.MOVIE_API_KEY;
 
     @BindView(R.id.recyclerview_posters) RecyclerView mRecyclerView;
 
     private MovieAdapter mMovieAdapter;
 
     private List<Movie> movies;
+    private String sortBy = "popular";
+
+    @BindView(R.id.toolbar) Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle(R.string.popular_title);
 
         GridLayoutManager layoutManager =
                 new GridLayoutManager(this, getResources()
@@ -83,7 +91,15 @@ public class MainActivity extends AppCompatActivity
         mMovieAdapter = new MovieAdapter(this);
         mRecyclerView.setAdapter(mMovieAdapter);
 
-        fetchPosters("popular");
+        if (savedInstanceState != null) {
+            sortBy = savedInstanceState.getString("sort_by");
+            if (savedInstanceState.containsKey("poster_uris")) {
+                ArrayList posterUris = savedInstanceState.getParcelableArrayList("poster_uris");
+                mMovieAdapter.setPosterData(posterUris);
+            }
+        } else {
+            fetchPosters(sortBy);
+        }
 
         Toast.makeText(getApplicationContext(),
                 getString(R.string.attrib), Toast.LENGTH_SHORT).show();
@@ -140,14 +156,29 @@ public class MainActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.sort_by_top_rated:
-                fetchPosters("top_rated");
+                getSupportActionBar().setTitle(R.string.top_rated_title);
+                sortBy = "top_rated";
+                fetchPosters(sortBy);
                 return true;
             case R.id.sort_by_most_popular:
-                fetchPosters("popular");
+                getSupportActionBar().setTitle(R.string.popular_title);
+                sortBy = "popular";
+                fetchPosters(sortBy);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outstate) {
+        super.onSaveInstanceState(outstate);
+
+        ArrayList posterUris = mMovieAdapter.getPosterUris();
+        if (posterUris != null && !posterUris.isEmpty()) {
+            outstate.putParcelableArrayList("poster_uris", posterUris);
+        }
+        outstate.putString("sort_by", sortBy);
     }
 
 }

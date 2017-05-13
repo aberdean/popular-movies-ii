@@ -18,6 +18,8 @@
     <string name="app_name">PopularMovies</string>
     <string name="top_rated">Top Rated</string>
     <string name="most_popular">Most Popular</string>
+    <string name="top_rated_title">Top Rated Movies</string>
+    <string name="popular_title">Popular Movies</string>
     <string name="poster_base_uri">https://image.tmdb.org/t/p/w500</string>
     <string name="released">Released: %1$s</string>
     <string name="rating">Rating: %1$s</string>

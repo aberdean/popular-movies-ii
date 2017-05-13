@@ -106,4 +106,8 @@ class MovieAdapter
         mPosterData = posterData;
         notifyDataSetChanged();
     }
+
+    public ArrayList getPosterUris() {
+        return mPosterData;
+    }
 }

@@ -20,11 +20,13 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -70,6 +72,8 @@ public class MovieDetails extends AppCompatActivity
     private ReviewAdapter mReviewAdapter;
     private TrailerAdapter mTrailerAdapter;
 
+    @BindView(R.id.toolbar) Toolbar toolbar;
+
     @BindView(R.id.recyclerview_reviews) RecyclerView mReviews;
     @BindView(R.id.recyclerview_trailers) RecyclerView mTrailers;
 
@@ -90,6 +94,11 @@ public class MovieDetails extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.movie_details);
         ButterKnife.bind(this);
+
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setLogo(R.mipmap.ic_launcher);
+//        getSupportActionBar().setDisplayUseLogoEnabled(true);
 
         Intent intent = getIntent();
 
@@ -118,6 +127,7 @@ public class MovieDetails extends AppCompatActivity
 
             String title = mChosenMovie.getTitle();
             mOriginalTitle.setText(title);
+            getSupportActionBar().setTitle(title);
 
             Double rating = mChosenMovie.getRating();
             String rate = String.format(
@@ -194,46 +204,4 @@ public class MovieDetails extends AppCompatActivity
         startActivity(intentToStartTrailer);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.color_scheme, menu);
-        return true;
-    }
-
-    //TODO: Move color scheme choice to preferences
-    /**
-     * Allows the user to toggle between a light and a dark theme.
-     * @param item the selected menu item
-     * @return true or inherit from parent
-     */
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        FrameLayout background =
-                (FrameLayout) findViewById(R.id.background_color);
-        switch (item.getItemId()) {
-            case R.id.dark_scheme:
-                background.setBackgroundColor(ContextCompat.getColor(this,
-                        R.color.colorBackground));
-                mReleaseDate.setTextColor(ContextCompat.getColor(this,
-                        R.color.colorText));
-                mRating.setTextColor(ContextCompat.getColor(this,
-                        R.color.colorText));
-                mSynopsis.setTextColor(ContextCompat.getColor(this,
-                        R.color.colorText));
-                return true;
-            case R.id.light_scheme:
-                background.setBackgroundColor(ContextCompat.getColor(this,
-                        R.color.colorText));
-                mReleaseDate.setTextColor(ContextCompat.getColor(this,
-                        R.color.colorBackground));
-                mRating.setTextColor(ContextCompat.getColor(this,
-                        R.color.colorBackground));
-                mSynopsis.setTextColor(ContextCompat.getColor(this,
-                        R.color.colorBackground));
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
 }

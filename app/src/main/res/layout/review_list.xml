@@ -20,21 +20,37 @@
     android:layout_height="wrap_content"
     android:paddingBottom="@dimen/padding">
 
-    <TextView
-        android:id="@+id/tv_author"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        android:paddingBottom="@dimen/padding"
-        android:textColor="@color/colorText"
-        android:textSize="@dimen/text_small"
-        android:fontFeatureSettings="smcp" />
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/tv_review"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/colorText"
-        android:textSize="@dimen/text_small" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding"
+            android:background="@color/cardColor">
+
+            <TextView
+                android:id="@+id/tv_author"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:paddingBottom="@dimen/padding"
+                android:textColor="@color/colorText"
+                android:textSize="@dimen/text_small"
+                android:fontFeatureSettings="smcp" />
+
+            <TextView
+                android:id="@+id/tv_review"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding_top"
+                android:textColor="@color/colorText"
+                android:textSize="@dimen/text_small" />
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
 
 </LinearLayout>
