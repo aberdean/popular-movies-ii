@@ -20,4 +20,5 @@
     <color name="colorAccent">#d81b60</color>
     <color name="colorBackground">#263238</color>
     <color name="colorText">#e9dcd3</color>
+    <color name="cardColor">#f0263238</color>
 </resources>

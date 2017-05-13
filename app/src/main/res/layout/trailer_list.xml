@@ -35,6 +35,7 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="@dimen/card_padding"
                 android:paddingTop="@dimen/padding"
+                android:background="@color/cardColor"
                 android:scaleType="centerInside" />
 
         </RelativeLayout>
@@ -43,10 +44,9 @@
             android:id="@+id/tv_trailer_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/colorBackground"
+            android:textColor="@color/colorText"
             android:textSize="@dimen/text_small"
-            android:layout_gravity="bottom"
-            android:textAlignment="center"
+            android:layout_gravity="bottom|center_horizontal"
             android:fontFeatureSettings="smcp" />
 
     </android.support.v7.widget.CardView>
