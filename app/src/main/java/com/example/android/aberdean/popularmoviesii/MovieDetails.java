@@ -85,6 +85,9 @@ public class MovieDetails extends AppCompatActivity
     @BindView(R.id.tv_release_date) TextView mReleaseDate;
     @BindView(R.id.tv_rating) TextView mRating;
 
+    @BindView(R.id.iv_favorite_option) ImageView mFavoriteOption;
+    @BindView(R.id.iv_favorite) ImageView mFavorite;
+
     /**
      * Assigns the appropriate values for the chosen movie.
      * @param savedInstanceState the previously saved state
@@ -97,8 +100,6 @@ public class MovieDetails extends AppCompatActivity
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        getSupportActionBar().setLogo(R.mipmap.ic_launcher);
-//        getSupportActionBar().setDisplayUseLogoEnabled(true);
 
         Intent intent = getIntent();
 
@@ -128,6 +129,9 @@ public class MovieDetails extends AppCompatActivity
             String title = mChosenMovie.getTitle();
             mOriginalTitle.setText(title);
             getSupportActionBar().setTitle(title);
+
+            mFavoriteOption.setImageResource(R.drawable.heart_outline);
+            mFavorite.setImageResource(R.drawable.heart);
 
             Double rating = mChosenMovie.getRating();
             String rate = String.format(
