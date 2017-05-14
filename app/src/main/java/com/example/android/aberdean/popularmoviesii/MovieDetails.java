@@ -214,16 +214,16 @@ public class MovieDetails extends AppCompatActivity
     public void setFavorite() {
         FavoriteDbHelper dbHelper = new FavoriteDbHelper(this);
         SQLiteDatabase mDb = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(FavoriteContract.FavoriteEntry.COLUMN_ID, mId);
+        values.put(FavoriteContract.FavoriteEntry.COLUMN_TITLE, mOriginalTitle.toString());
+        values.put(FavoriteContract.FavoriteEntry.COLUMN_URL, posterUri);
         try {
-            ContentValues values = new ContentValues();
-            values.put(FavoriteContract.FavoriteEntry.COLUMN_ID, mId);
-            values.put(FavoriteContract.FavoriteEntry.COLUMN_TITLE, mOriginalTitle.toString());
-            values.put(FavoriteContract.FavoriteEntry.COLUMN_URL, posterUri);
-            mDb.insert(FavoriteContract.FavoriteEntry.TABLE_NAME, null, values);
+            mDb.insertOrThrow(FavoriteContract.FavoriteEntry.TABLE_NAME, null, values);
             mFavorite.setImageResource(R.drawable.heart);
-        } catch (SQLiteConstraintException e){
+        } catch (SQLiteConstraintException e) {
             mDb.delete(FavoriteContract.FavoriteEntry.TABLE_NAME,
-                    FavoriteContract.FavoriteEntry.COLUMN_URL + " = " + posterUri, null);
+                    FavoriteContract.FavoriteEntry.COLUMN_URL + " = ?", new String[] {posterUri});
             mFavorite.setImageResource(R.drawable.heart_outline);
         }
         mDb.close();
