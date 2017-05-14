@@ -25,7 +25,7 @@
     <string name="poster_base_uri">https://image.tmdb.org/t/p/w500</string>
     <string name="released">Released: %1$s</string>
     <string name="rating">Rating: %1$s</string>
-    <string name="attrib">Powered by TMDb</string>
+    <string name="attrib">Powered by TMDb\nLauncher Icon by icons8.com</string>
     <string name="dark">Dark Theme</string>
     <string name="light">Light Theme</string>
     <string name="review_title">Reviews</string>
