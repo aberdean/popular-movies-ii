@@ -40,6 +40,7 @@ import butterknife.ButterKnife;
 class MovieAdapter
         extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHolder> {
 
+    /* holds the urls for the posters */
     private ArrayList mPosterData;
 
     private final MovieAdapterOnClickHandler mClickHandler;
@@ -48,11 +49,16 @@ class MovieAdapter
         void onClick(int adapterPosition);
     }
 
+    /* Constructor */
     MovieAdapter(MovieAdapterOnClickHandler clickHandler) {
 
         mClickHandler = clickHandler;
     }
 
+    /**
+     * Sets up a listener to react when a user clicks on a movie
+     * poster.
+     */
     class MovieAdapterViewHolder extends RecyclerView.ViewHolder
             implements OnClickListener {
 
@@ -64,6 +70,11 @@ class MovieAdapter
             view.setOnClickListener(this);
         }
 
+        /**
+         * When a user clicks on a movie poster,
+         * pass the movie position to the handler.
+         * @param v the view that was clicked
+         */
         @Override
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
@@ -72,6 +83,13 @@ class MovieAdapter
         }
     }
 
+    /**
+     * When the holder is created, sets up the view
+     * and passes it to the holder.
+     * @param viewGroup the view group
+     * @param viewType the view type
+     * @return the view holder
+     */
     @Override
     public MovieAdapterViewHolder onCreateViewHolder(
             ViewGroup viewGroup, int viewType) {
@@ -85,6 +103,11 @@ class MovieAdapter
         return new MovieAdapterViewHolder(view);
     }
 
+    /**
+     * When binding the view holder, renders the posters.
+     * @param holder the view holder
+     * @param position the position of the movie
+     */
     @Override
     public void onBindViewHolder(MovieAdapterViewHolder holder, int position) {
         final String posterUrl = mPosterData.get(position).toString();
@@ -94,6 +117,10 @@ class MovieAdapter
                 .into(holder.mPosterImageView);
     }
 
+    /**
+     * Provides the amount of posters.
+     * @return the number of movie posters
+     */
     @Override
     public int getItemCount() {
         if (mPosterData == null) {
@@ -102,12 +129,20 @@ class MovieAdapter
         return mPosterData.size();
     }
 
+    /**
+     * Sets the poster urls and notifies when they change.
+     * @param posterData the array of posters
+     */
     void setPosterData(ArrayList posterData) {
         mPosterData = posterData;
         notifyDataSetChanged();
     }
 
-    public ArrayList getPosterUris() {
+    /**
+     * Provides the urls of the movie posters.
+     * @return the urls of the posters
+     */
+    ArrayList getPosterUris() {
         return mPosterData;
     }
 }

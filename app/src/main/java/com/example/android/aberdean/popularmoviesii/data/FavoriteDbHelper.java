@@ -25,7 +25,7 @@ public class FavoriteDbHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "favorite.db";
     private static final int DATABASE_VERSION = 5;
 
-    public FavoriteDbHelper(Context context) {
+    FavoriteDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 

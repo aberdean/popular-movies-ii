@@ -75,8 +75,12 @@ public class FavoriteContentProvider extends ContentProvider {
                                 .FavoriteEntry.CONTENT_URI, id);
                     }
                 } catch (SQLiteConstraintException e) {
-                    /* it's fine, it means the user wanted to delete it from the favorites,
-                     * reset returnUri, just to make sure not to return garbage
+                    /*
+                     * It's fine, it means the user wanted to delete it from the favorites,
+                     * since the database entries have a UNIQUE constraint to avoid adding
+                     * the same movie twice.
+                     * Reset returnUri, just to make sure not to return garbage (or better,
+                     * just not to leave the catch clause empty!).
                      */
                     returnUri = null;
                 }

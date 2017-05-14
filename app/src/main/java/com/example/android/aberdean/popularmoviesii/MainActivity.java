@@ -18,7 +18,6 @@ package com.example.android.aberdean.popularmoviesii;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -31,7 +30,6 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.android.aberdean.popularmoviesii.data.FavoriteContract;
-import com.example.android.aberdean.popularmoviesii.data.FavoriteDbHelper;
 import com.example.android.aberdean.popularmoviesii.models.Movie;
 import com.example.android.aberdean.popularmoviesii.utilities.MoviesDbService;
 import com.example.android.aberdean.popularmoviesii.utilities.MoviesResponse;
@@ -55,6 +53,7 @@ import retrofit2.Response;
  * NOTE: The API key must be set in a variable called ApiKey
  * within the gradle.properties file.
  */
+@SuppressWarnings("ConstantConditions")
 public class MainActivity extends AppCompatActivity
         implements MovieAdapter.MovieAdapterOnClickHandler {
 
@@ -100,7 +99,7 @@ public class MainActivity extends AppCompatActivity
                 ArrayList posterUris = savedInstanceState.getParcelableArrayList("poster_uris");
                 mMovieAdapter.setPosterData(posterUris);
             }
-        } else if (sortBy == "favorites") {
+        } else if (sortBy.equals("favorites")) {
             fetchDbPosters();
         } else {
             fetchPosters(sortBy);
@@ -111,6 +110,9 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    /**
+     * Fetch the posters of the favorite movies from the database.
+     */
     private void fetchDbPosters() {
         Cursor cursor = getContentResolver().query(FavoriteContract.FavoriteEntry.CONTENT_URI,
                 new String[]{FavoriteContract.FavoriteEntry.COLUMN_URL},
@@ -118,7 +120,7 @@ public class MainActivity extends AppCompatActivity
                 null,
                 null
         );
-        ArrayList<String> mPosterUris = null;
+        ArrayList<String> mPosterUris;
         if (cursor != null) {
             mPosterUris = new ArrayList<>(cursor.getCount());
             cursor.moveToFirst();
@@ -168,7 +170,7 @@ public class MainActivity extends AppCompatActivity
      * @param position the position of the movie
      */
     public void onClick(int position) {
-        if (sortBy == "favorites") {
+        if (sortBy.equals("favorites")) {
             Toast.makeText(getApplicationContext(),
                     getString(R.string.no_details), Toast.LENGTH_SHORT).show();
         } else {
@@ -209,6 +211,11 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Sets the current state of the posters and the
+     * sortBy variable in a bundle to restore the state.
+     * @param outstate the bundle to save the state
+     */
     @Override
     public void onSaveInstanceState(Bundle outstate) {
         super.onSaveInstanceState(outstate);

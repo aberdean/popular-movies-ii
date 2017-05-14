@@ -20,12 +20,8 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
-import android.database.SQLException;
-import android.database.sqlite.SQLiteConstraintException;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -36,7 +32,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.aberdean.popularmoviesii.data.FavoriteContract;
-import com.example.android.aberdean.popularmoviesii.data.FavoriteDbHelper;
 import com.example.android.aberdean.popularmoviesii.models.Movie;
 import com.example.android.aberdean.popularmoviesii.models.Review;
 import com.example.android.aberdean.popularmoviesii.models.Trailer;
@@ -165,6 +160,7 @@ public class MovieDetails extends AppCompatActivity
         mTrailerAdapter = new TrailerAdapter(this);
         mTrailers.setAdapter(mTrailerAdapter);
 
+        /* fetch the reviews */
         MoviesDbService service = NetworkClient.getClient().create(MoviesDbService.class);
         Call<ReviewsResponse> reviewCall = service.getReviews(mId, BuildConfig.MOVIE_API_KEY);
 
@@ -183,6 +179,7 @@ public class MovieDetails extends AppCompatActivity
             });
         }
 
+        /* fetch the trailers */
         Call<TrailersResponse> trailerCall = service.getTrailers(mId, BuildConfig.MOVIE_API_KEY);
 
         if (trailerCall != null) {
@@ -213,6 +210,14 @@ public class MovieDetails extends AppCompatActivity
         startActivity(intentToStartTrailer);
     }
 
+    /**
+     * When the favorite icon is clicked, try to insert the movie in
+     * the favorite database and change the icon to a filled heart.
+     * If it is already in the database, then it means the user clicked
+     * on the icon again to remove it from the favorites. Thus, delete
+     * the movie from the database and change the icon to the outline
+     * of a heart.
+     */
     @OnClick(R.id.iv_favorite)
     public void setFavorite() {
         ContentValues values = new ContentValues();
@@ -231,6 +236,13 @@ public class MovieDetails extends AppCompatActivity
         }
     }
 
+    /**
+     * Sets the appropriate icon for the movie.
+     * If the movie is in the favorite database, then
+     * use a filled heart, otherwise only the outline
+     * of a heart.
+     * @param id the movie id
+     */
     private void getFavoriteIcon(int id) {
 
         Cursor cursor = getContentResolver().query(FavoriteContract.FavoriteEntry.CONTENT_URI,

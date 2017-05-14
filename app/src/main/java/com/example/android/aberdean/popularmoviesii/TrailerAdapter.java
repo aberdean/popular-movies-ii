@@ -18,7 +18,6 @@ package com.example.android.aberdean.popularmoviesii;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,8 +40,6 @@ import butterknife.BindView;
  */
 class TrailerAdapter
         extends RecyclerView.Adapter<TrailerAdapter.TrailerAdapterViewHolder> {
-
-    private static final String TAG = TrailerAdapter.class.getSimpleName();
 
     private List<Trailer> mTrailerData;
 
@@ -92,7 +89,6 @@ class TrailerAdapter
     public void onBindViewHolder(TrailerAdapterViewHolder holder, int position) {
         Context mContext = holder.mTrailerImageView.getContext();
         holder.mTrailerTitleTextView.setText(mTrailerData.get(position).getName());
-        Log.v(TAG, "Trailer URL " + mTrailerData.get(position).getTrailerThumbUrl(mContext));
         final String trailerUrl = mTrailerData.get(position).getTrailerThumbUrl(mContext);
         Picasso.with(mContext)
                 .load(trailerUrl)

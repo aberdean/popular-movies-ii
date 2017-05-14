@@ -30,8 +30,6 @@ import java.util.List;
 import butterknife.ButterKnife;
 import butterknife.BindView;
 
-import static java.security.AccessController.getContext;
-
 /**
  * Passes the reviews for a movie retrieved from IMDb
  * into the RecyclerView.
@@ -41,15 +39,15 @@ class ReviewAdapter
 
     private List<Review> mReviewData;
 
-    public ReviewAdapter() {
+    ReviewAdapter() {
 
     }
 
-    public class ReviewAdapterViewHolder extends RecyclerView.ViewHolder {
+    class ReviewAdapterViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.tv_author) TextView mAuthorTextView;
         @BindView(R.id.tv_review) TextView mReviewTextView;
 
-        public ReviewAdapterViewHolder(View view) {
+        ReviewAdapterViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
         }
