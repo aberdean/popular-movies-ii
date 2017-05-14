@@ -38,6 +38,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.android.aberdean.popularmoviesii.MainActivity" />
         </activity>
+        <provider android:name="com.example.android.aberdean.popularmoviesii.data.FavoriteContentProvider"
+            android:authorities="com.example.android.aberdean.popularmoviesii"
+            android:exported="false" />
     </application>
 
 </manifest>

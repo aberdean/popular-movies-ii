@@ -112,29 +112,26 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void fetchDbPosters() {
-        FavoriteDbHelper dbHelper = new FavoriteDbHelper(this);
-        SQLiteDatabase mDb = dbHelper.getReadableDatabase();
-        Cursor cursor = mDb.query(
-                FavoriteContract.FavoriteEntry.TABLE_NAME,
-                new String[] {FavoriteContract.FavoriteEntry.COLUMN_URL},
-                null,
-                null,
+        Cursor cursor = getContentResolver().query(FavoriteContract.FavoriteEntry.CONTENT_URI,
+                new String[]{FavoriteContract.FavoriteEntry.COLUMN_URL},
                 null,
                 null,
                 null
         );
-        ArrayList<String> mPosterUris = new ArrayList<>(cursor.getCount());
-        cursor.moveToFirst();
+        ArrayList<String> mPosterUris = null;
+        if (cursor != null) {
+            mPosterUris = new ArrayList<>(cursor.getCount());
+            cursor.moveToFirst();
 
-        while (!cursor.isAfterLast()) {
-            String url = cursor.getString(cursor.getColumnIndex("poster_url"));
-        mPosterUris.add(url);
-        Log.v(TAG, "Poster URL: " + url);
-        cursor.moveToNext();
-    }
-        cursor.close();
-        mDb.close();
-        mMovieAdapter.setPosterData(mPosterUris);
+            while (!cursor.isAfterLast()) {
+                String url = cursor.getString(cursor.getColumnIndex("poster_url"));
+                mPosterUris.add(url);
+                Log.v(TAG, "Poster URL: " + url);
+                cursor.moveToNext();
+            }
+            cursor.close();
+            mMovieAdapter.setPosterData(mPosterUris);
+        }
 
     }
 

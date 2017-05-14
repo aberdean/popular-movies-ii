@@ -211,21 +211,21 @@ public class MovieDetails extends AppCompatActivity
 
     @OnClick(R.id.iv_favorite)
     public void setFavorite() {
-        FavoriteDbHelper dbHelper = new FavoriteDbHelper(this);
-        SQLiteDatabase mDb = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(FavoriteContract.FavoriteEntry.COLUMN_ID, mId);
         values.put(FavoriteContract.FavoriteEntry.COLUMN_TITLE, mOriginalTitle.toString());
         values.put(FavoriteContract.FavoriteEntry.COLUMN_URL, posterUri);
-        try {
-            mDb.insertOrThrow(FavoriteContract.FavoriteEntry.TABLE_NAME, null, values);
+
+        Uri uri = getContentResolver().insert(FavoriteContract.FavoriteEntry.CONTENT_URI, values);
+        if (uri != null) {
             mFavorite.setImageResource(R.drawable.heart);
-        } catch (SQLiteConstraintException e) {
-            mDb.delete(FavoriteContract.FavoriteEntry.TABLE_NAME,
-                    FavoriteContract.FavoriteEntry.COLUMN_URL + " = ?", new String[] {posterUri});
-            mFavorite.setImageResource(R.drawable.heart_outline);
         }
-        mDb.close();
+//        } else {
+//            mDb.delete(FavoriteContract.FavoriteEntry.TABLE_NAME,
+//                    FavoriteContract.FavoriteEntry.COLUMN_URL + " = ?", new String[] {posterUri});
+//            mFavorite.setImageResource(R.drawable.heart_outline);
+//        }
+//        mDb.close();
     }
 
     private void getFavoriteIcon(int id) {
