@@ -20,10 +20,12 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -101,7 +103,9 @@ public class MovieDetails extends AppCompatActivity
         ButterKnife.bind(this);
 
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         Intent intent = getIntent();
 
@@ -215,48 +219,47 @@ public class MovieDetails extends AppCompatActivity
         values.put(FavoriteContract.FavoriteEntry.COLUMN_ID, mId);
         values.put(FavoriteContract.FavoriteEntry.COLUMN_TITLE, mOriginalTitle.toString());
         values.put(FavoriteContract.FavoriteEntry.COLUMN_URL, posterUri);
-
         Uri uri = getContentResolver().insert(FavoriteContract.FavoriteEntry.CONTENT_URI, values);
         if (uri != null) {
             mFavorite.setImageResource(R.drawable.heart);
+        } else {
+            String stringId = Integer.toString(mId);
+            uri = FavoriteContract.FavoriteEntry.CONTENT_URI;
+            uri = uri.buildUpon().appendPath(stringId).build();
+            getContentResolver().delete(uri, null, null);
+            mFavorite.setImageResource(R.drawable.heart_outline);
         }
-//        } else {
-//            mDb.delete(FavoriteContract.FavoriteEntry.TABLE_NAME,
-//                    FavoriteContract.FavoriteEntry.COLUMN_URL + " = ?", new String[] {posterUri});
-//            mFavorite.setImageResource(R.drawable.heart_outline);
-//        }
-//        mDb.close();
     }
 
     private void getFavoriteIcon(int id) {
-        FavoriteDbHelper dbHelper = new FavoriteDbHelper(this);
-        SQLiteDatabase mDb = dbHelper.getReadableDatabase();
-        Cursor cursor = mDb.query(
-                FavoriteContract.FavoriteEntry.TABLE_NAME,
-                new String[] {FavoriteContract.FavoriteEntry.COLUMN_ID},
-                null,
-                null,
+
+        Cursor cursor = getContentResolver().query(FavoriteContract.FavoriteEntry.CONTENT_URI,
+                new String[]{FavoriteContract.FavoriteEntry.COLUMN_ID},
                 null,
                 null,
                 null
         );
 
-        cursor.moveToFirst();
-        boolean inDb = false;
-        while (!cursor.isAfterLast()) {
-            int db_id = cursor.getInt(cursor.getColumnIndex("id"));
-            if (db_id == id)  {
-                inDb = true;
+        if (cursor != null) {
+            cursor.moveToFirst();
+
+            boolean inDb = false;
+            while (!cursor.isAfterLast()) {
+                int db_id = cursor.getInt(cursor.getColumnIndex("id"));
+                if (db_id == id) {
+                    inDb = true;
+                }
+                Log.v(TAG, "Movie ID: " + id + "; DB Movie ID: " + db_id);
+                cursor.moveToNext();
             }
-            Log.v(TAG, "Movie ID: " + id + "; DB Movie ID: " + db_id);
-            cursor.moveToNext();
-        }
-        cursor.close();
-        mDb.close();
-        if (inDb) {
-            mFavorite.setImageResource(R.drawable.heart);
-        } else {
-            mFavorite.setImageResource(R.drawable.heart_outline);
+
+            cursor.close();
+
+            if (inDb) {
+                mFavorite.setImageResource(R.drawable.heart);
+            } else {
+                mFavorite.setImageResource(R.drawable.heart_outline);
+            }
         }
     }
 

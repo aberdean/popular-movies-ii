@@ -22,12 +22,14 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import static com.example.android.aberdean.popularmoviesii.data.FavoriteContract.FavoriteEntry.TABLE_NAME;
 
+@SuppressWarnings("ConstantConditions")
 public class FavoriteContentProvider extends ContentProvider {
 
     public static final int FAVORITES = 100;
@@ -62,21 +64,27 @@ public class FavoriteContentProvider extends ContentProvider {
 
         int match = sUriMatcher.match(uri);
 
-        Uri returnUri;
+        Uri returnUri = null;
 
         switch(match) {
             case FAVORITES:
-                long id = db.insert(TABLE_NAME, null,  values);
-                if (id > 0) {
-                    returnUri = ContentUris.withAppendedId(FavoriteContract
-                            .FavoriteEntry.CONTENT_URI, id);
-                } else {
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                try {
+                    long id = db.insert(TABLE_NAME, null,  values);
+                    if (id > 0) {
+                        returnUri = ContentUris.withAppendedId(FavoriteContract
+                                .FavoriteEntry.CONTENT_URI, id);
+                    }
+                } catch (SQLiteConstraintException e) {
+                    /* it's fine, it means the user wanted to delete it from the favorites,
+                     * reset returnUri, just to make sure not to return garbage
+                     */
+                    returnUri = null;
                 }
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
+
 
         getContext().getContentResolver().notifyChange(uri, null);
 
@@ -100,6 +108,8 @@ public class FavoriteContentProvider extends ContentProvider {
                         projection,
                         selection,
                         selectionArgs,
+                        null,
+                        null,
                         sortOrder);
                 break;
             default:
@@ -114,7 +124,30 @@ public class FavoriteContentProvider extends ContentProvider {
     @Override
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
 
-        throw new UnsupportedOperationException("Not yet implemented");
+        final SQLiteDatabase db = mFavoriteDbHelper.getWritableDatabase();
+
+        int match = sUriMatcher.match(uri);
+
+        int moviesDeleted;
+
+        switch(match) {
+
+            case FAVORITE_WITH_ID:
+
+                String dbId = uri.getPathSegments().get(1);
+
+                moviesDeleted = db.delete(TABLE_NAME, "id=?", new String[]{dbId});
+
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+
+        if (moviesDeleted != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
+        return moviesDeleted;
     }
 
 
@@ -124,7 +157,6 @@ public class FavoriteContentProvider extends ContentProvider {
 
         throw new UnsupportedOperationException("Not yet implemented");
     }
-
 
     @Override
     public String getType(@NonNull Uri uri) {
