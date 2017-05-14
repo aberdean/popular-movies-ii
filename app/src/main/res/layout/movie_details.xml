@@ -16,6 +16,7 @@
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/background_color"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -86,7 +87,8 @@
                         android:layout_height="@dimen/thumb_height"
                         android:paddingTop="@dimen/padding"
                         android:layout_weight="1"
-                        android:scaleType="fitXY" />
+                        android:scaleType="fitXY"
+                        tools:mockup=""/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -98,24 +100,21 @@
                     <TextView
                         android:id="@+id/tv_title"
                         android:layout_width="wrap_content"
-                        android:layout_height="@dimen/title_height"
+                        android:layout_height="wrap_content"
                         android:gravity="center_vertical"
                         android:textAppearance="@style/Base.TextAppearance.AppCompat.Title"
                         android:fontFeatureSettings="smcp"
+                        android:layout_marginTop="@dimen/padding_top"
                         android:textColor="@color/colorAccent"
-                        android:textSize="@dimen/text_medium" />
+                        android:textSize="@dimen/text_medium"
+                        tools:text="Movie title" />
 
-                    <ImageView
-                        android:id="@+id/iv_favorite_option"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/card_padding"
-                        android:visibility="visible"/>
                     <ImageView
                         android:id="@+id/iv_favorite"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:visibility="gone"/>
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        tools:src="@drawable/heart_outline" />
 
                     <TextView
                         android:id="@+id/tv_release_date"
@@ -128,6 +127,7 @@
                         android:id="@+id/tv_rating"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:paddingBottom="@dimen/padding"
                         android:textColor="@color/colorText"
                         android:textSize="@dimen/text_small" />
                 </LinearLayout>

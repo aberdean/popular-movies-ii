@@ -17,6 +17,8 @@
 package com.example.android.aberdean.popularmoviesii;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -28,6 +30,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.example.android.aberdean.popularmoviesii.data.FavoriteContract;
+import com.example.android.aberdean.popularmoviesii.data.FavoriteDbHelper;
 import com.example.android.aberdean.popularmoviesii.models.Movie;
 import com.example.android.aberdean.popularmoviesii.utilities.MoviesDbService;
 import com.example.android.aberdean.popularmoviesii.utilities.MoviesResponse;
@@ -47,6 +51,9 @@ import retrofit2.Response;
  * Allows the user to select sorting by popularity or by rating.
  * Start activity MovieDetails when the user clicks on one
  * of the movies' poster.
+ *
+ * NOTE: The API key must be set in a variable called ApiKey
+ * within the gradle.properties file.
  */
 public class MainActivity extends AppCompatActivity
         implements MovieAdapter.MovieAdapterOnClickHandler {
@@ -57,10 +64,6 @@ public class MainActivity extends AppCompatActivity
      */
     @SuppressWarnings("unused")
     private static final String TAG = MainActivity.class.getSimpleName();
-
-    // The API key must be set in a variable called ApiKey
-    // within the gradle.properties file
-    private static final String API_KEY = BuildConfig.MOVIE_API_KEY;
 
     @BindView(R.id.recyclerview_posters) RecyclerView mRecyclerView;
 
@@ -97,12 +100,41 @@ public class MainActivity extends AppCompatActivity
                 ArrayList posterUris = savedInstanceState.getParcelableArrayList("poster_uris");
                 mMovieAdapter.setPosterData(posterUris);
             }
+        } else if (sortBy == "favorites") {
+            fetchDbPosters();
         } else {
             fetchPosters(sortBy);
         }
 
         Toast.makeText(getApplicationContext(),
                 getString(R.string.attrib), Toast.LENGTH_SHORT).show();
+
+    }
+
+    private void fetchDbPosters() {
+        FavoriteDbHelper dbHelper = new FavoriteDbHelper(this);
+        SQLiteDatabase mDb = dbHelper.getReadableDatabase();
+        Cursor cursor = mDb.query(
+                FavoriteContract.FavoriteEntry.TABLE_NAME,
+                new String[] {FavoriteContract.FavoriteEntry.COLUMN_URL},
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+        ArrayList<String> mPosterUris = new ArrayList<>(cursor.getCount());
+        cursor.moveToFirst();
+
+        while (!cursor.isAfterLast()) {
+            String url = cursor.getString(cursor.getColumnIndex("poster_url"));
+            mPosterUris.add(url);
+            Log.v(TAG, "Poster URL: " + url);
+            cursor.moveToNext();
+        }
+        cursor.close();
+        mDb.close();
+        mMovieAdapter.setPosterData(mPosterUris);
 
     }
 
@@ -139,10 +171,15 @@ public class MainActivity extends AppCompatActivity
      * @param position the position of the movie
      */
     public void onClick(int position) {
-        Class destinationClass = MovieDetails.class;
-        Intent intentToStartMovieDetails = new Intent(this, destinationClass);
-        intentToStartMovieDetails.putExtra("movie", movies.get(position));
-        startActivity(intentToStartMovieDetails);
+        if (sortBy == "favorites") {
+            Toast.makeText(getApplicationContext(),
+                    getString(R.string.no_details), Toast.LENGTH_SHORT).show();
+        } else {
+            Class destinationClass = MovieDetails.class;
+            Intent intentToStartMovieDetails = new Intent(this, destinationClass);
+            intentToStartMovieDetails.putExtra("movie", movies.get(position));
+            startActivity(intentToStartMovieDetails);
+        }
     }
 
     @Override
@@ -164,6 +201,11 @@ public class MainActivity extends AppCompatActivity
                 getSupportActionBar().setTitle(R.string.popular_title);
                 sortBy = "popular";
                 fetchPosters(sortBy);
+                return true;
+            case R.id.sort_by_favorite:
+                getSupportActionBar().setTitle(R.string.favorite_title);
+                sortBy = "favorites";
+                fetchDbPosters();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

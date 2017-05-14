@@ -16,25 +16,26 @@
 
 package com.example.android.aberdean.popularmoviesii;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.widget.FrameLayout;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.android.aberdean.popularmoviesii.data.FavoriteContract;
+import com.example.android.aberdean.popularmoviesii.data.FavoriteDbHelper;
 import com.example.android.aberdean.popularmoviesii.models.Movie;
 import com.example.android.aberdean.popularmoviesii.models.Review;
 import com.example.android.aberdean.popularmoviesii.models.Trailer;
@@ -48,6 +49,7 @@ import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.BindView;
+import butterknife.OnClick;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -85,8 +87,9 @@ public class MovieDetails extends AppCompatActivity
     @BindView(R.id.tv_release_date) TextView mReleaseDate;
     @BindView(R.id.tv_rating) TextView mRating;
 
-    @BindView(R.id.iv_favorite_option) ImageView mFavoriteOption;
     @BindView(R.id.iv_favorite) ImageView mFavorite;
+
+    private String posterUri;
 
     /**
      * Assigns the appropriate values for the chosen movie.
@@ -109,7 +112,7 @@ public class MovieDetails extends AppCompatActivity
 
             Resources res = getResources();
 
-            String posterUri = mChosenMovie.getPosterUri(this);
+            posterUri = mChosenMovie.getPosterUri(this);
             Picasso.with(this)
                     .load(posterUri)
                     .into(mPosterThumb);
@@ -130,8 +133,7 @@ public class MovieDetails extends AppCompatActivity
             mOriginalTitle.setText(title);
             getSupportActionBar().setTitle(title);
 
-            mFavoriteOption.setImageResource(R.drawable.heart_outline);
-            mFavorite.setImageResource(R.drawable.heart);
+            mFavorite.setImageResource(R.drawable.heart_outline);
 
             Double rating = mChosenMovie.getRating();
             String rate = String.format(
@@ -206,6 +208,25 @@ public class MovieDetails extends AppCompatActivity
         Trailer trailer = trailers.get(trailerPosition);
         Intent intentToStartTrailer = new Intent(ACTION_VIEW, Uri.parse(trailer.getTrailerUrl(this)));
         startActivity(intentToStartTrailer);
+    }
+
+    @OnClick(R.id.iv_favorite)
+    public void setFavorite() {
+        FavoriteDbHelper dbHelper = new FavoriteDbHelper(this);
+        SQLiteDatabase mDb = dbHelper.getWritableDatabase();
+        try {
+            ContentValues values = new ContentValues();
+            values.put(FavoriteContract.FavoriteEntry.COLUMN_ID, mId);
+            values.put(FavoriteContract.FavoriteEntry.COLUMN_TITLE, mOriginalTitle.toString());
+            values.put(FavoriteContract.FavoriteEntry.COLUMN_URL, posterUri);
+            mDb.insert(FavoriteContract.FavoriteEntry.TABLE_NAME, null, values);
+            mFavorite.setImageResource(R.drawable.heart);
+        } catch (SQLiteConstraintException e){
+            mDb.delete(FavoriteContract.FavoriteEntry.TABLE_NAME,
+                    FavoriteContract.FavoriteEntry.COLUMN_URL + " = " + posterUri, null);
+            mFavorite.setImageResource(R.drawable.heart_outline);
+        }
+        mDb.close();
     }
 
 }
