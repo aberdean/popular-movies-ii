@@ -30,7 +30,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -133,14 +132,14 @@ public class MovieDetails extends AppCompatActivity
             mOriginalTitle.setText(title);
             getSupportActionBar().setTitle(title);
 
-            mFavorite.setImageResource(R.drawable.heart_outline);
-
             Double rating = mChosenMovie.getRating();
             String rate = String.format(
                     res.getString(R.string.rating), rating.toString());
             mRating.setText(rate);
 
             mId = mChosenMovie.getId();
+
+            getFavoriteIcon(mId);
         }
 
         LinearLayoutManager reviewLayoutManager = new LinearLayoutManager(this,
@@ -227,6 +226,38 @@ public class MovieDetails extends AppCompatActivity
             mFavorite.setImageResource(R.drawable.heart_outline);
         }
         mDb.close();
+    }
+
+    private void getFavoriteIcon(int id) {
+        FavoriteDbHelper dbHelper = new FavoriteDbHelper(this);
+        SQLiteDatabase mDb = dbHelper.getReadableDatabase();
+        Cursor cursor = mDb.query(
+                FavoriteContract.FavoriteEntry.TABLE_NAME,
+                new String[] {FavoriteContract.FavoriteEntry.COLUMN_ID},
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        cursor.moveToFirst();
+        boolean inDb = false;
+        while (!cursor.isAfterLast()) {
+            int db_id = cursor.getInt(cursor.getColumnIndex("id"));
+            if (db_id == id)  {
+                inDb = true;
+            }
+            Log.v(TAG, "Movie ID: " + id + "; DB Movie ID: " + db_id);
+            cursor.moveToNext();
+        }
+        cursor.close();
+        mDb.close();
+        if (inDb) {
+            mFavorite.setImageResource(R.drawable.heart);
+        } else {
+            mFavorite.setImageResource(R.drawable.heart_outline);
+        }
     }
 
 }

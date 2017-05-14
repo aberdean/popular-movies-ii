@@ -128,10 +128,10 @@ public class MainActivity extends AppCompatActivity
 
         while (!cursor.isAfterLast()) {
             String url = cursor.getString(cursor.getColumnIndex("poster_url"));
-            mPosterUris.add(url);
-            Log.v(TAG, "Poster URL: " + url);
-            cursor.moveToNext();
-        }
+        mPosterUris.add(url);
+        Log.v(TAG, "Poster URL: " + url);
+        cursor.moveToNext();
+    }
         cursor.close();
         mDb.close();
         mMovieAdapter.setPosterData(mPosterUris);

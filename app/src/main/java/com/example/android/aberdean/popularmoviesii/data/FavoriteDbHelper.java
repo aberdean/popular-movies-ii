@@ -23,7 +23,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class FavoriteDbHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "favorite.db";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
 
     public FavoriteDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
